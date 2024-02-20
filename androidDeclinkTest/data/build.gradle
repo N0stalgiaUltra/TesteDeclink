@@ -1,0 +1,50 @@
+plugins {
+    id("com.android.library")
+    id("org.jetbrains.kotlin.android")
+}
+
+android {
+    namespace = "com.n0stalgiaultra.data"
+    compileSdk = 33
+
+    defaultConfig {
+        minSdk = 25
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+}
+
+dependencies {
+
+    implementation project(":domain")
+    implementation project(":database")
+
+    def dependencies = rootProject.ext.dependencies
+    implementation  dependencies.retrofit2Retrofit
+    implementation  dependencies.gsonConverter
+    implementation  dependencies.okHttp
+    implementation  dependencies.retrofitCoroutines
+    implementation dependencies.coroutineCore
+    implementation dependencies.coroutineAndroid
+    implementation dependencies.coreKtx
+
+    testImplementation testJunit
+    testImplementation testMockk
+    testImplementation testAssertk
+    testImplementation testKotlinxCoroutines
+}

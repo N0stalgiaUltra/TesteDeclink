@@ -1,0 +1,45 @@
+ext{
+    roomVersion = "2.5.2"
+    koinVersion = "3.4.0"
+    koinAndroidVersion = "3.3.1"
+    retrofit2 = "2.9.0"
+
+    //koin, room, dependencias basicas do Android, viewBinding, SDP, Mockk
+    dependencies = [
+        roomRuntime            : "androidx.room:room-runtime:$roomVersion",
+        roomKtx                : "androidx.room:room-ktx:$roomVersion",
+        roomCompiler           : "androidx.room:room-compiler:$roomVersion",
+        roomTesting            : "androidx.room:room-testing:$roomVersion",
+
+        coroutineCore          : "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1",
+        coroutineAndroid       : "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4",
+
+        coreKtx                : 'androidx.core:core-ktx:1.10.0',
+        appCompact             : "androidx.appcompat:appcompat:1.6.1",
+        materialDesign         : "com.google.android.material:material:1.11.0",
+        constraintLayout       : "androidx.constraintlayout:constraintlayout:2.1.4",
+        lifecycleKtx           : 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1',
+
+        SPD                    : 'com.intuit.sdp:sdp-android:1.1.0',
+
+        koinCore               : "io.insert-koin:koin-core:$koinVersion",
+        koinAndroid            : "io.insert-koin:koin-android:$koinAndroidVersion",
+
+        retrofit2Retrofit      : "com.squareup.retrofit2:retrofit:$retrofit2",
+        gsonConverter          : "com.squareup.retrofit2:converter-gson:$retrofit2",
+        retrofitCoroutines     : "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2",
+        okHttp                 : "com.squareup.okhttp3:logging-interceptor:4.7.2",
+
+        lifecycleExtensions    : 'androidx.lifecycle:lifecycle-extensions:2.2.0',
+        liveData               : "androidx.lifecycle:lifecycle-livedata-ktx:2.6.1",
+
+        jsonSerialization      : "org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1",
+    ]
+
+    testJunit = "junit:junit:4.13.2"
+    testMockk = "io.mockk:mockk:1.12.5"
+    testAssertk = "com.willowtreeapps.assertk:assertk-jvm:0.25"
+    testKotlinxCoroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4"
+    androidTestJunit = "androidx.test.ext:junit:1.1.5"
+    androidTestExpresso = "androidx.test.espresso:espresso-core:3.5.1"
+}

@@ -1,0 +1,108 @@
+plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id ("kotlin-kapt")
+    id("androidx.navigation.safeargs.kotlin")
+}
+
+android {
+    namespace = "com.n0stalgiaultra.androidtest"
+    compileSdk = 33
+
+    testOptions{
+        unitTests{
+            includeAndroidResources = true
+        }
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
+    defaultConfig {
+        applicationId = "com.n0stalgiaultra.androidtest"
+        minSdk = 25
+        targetSdk = 33
+        versionCode = 1
+        versionName = "1.0"
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+    viewBinding{
+        enabled = true
+    }
+    buildFeatures {
+        viewBinding = true
+    }
+
+}
+configurations {
+    cleanedAnnotations
+    implementation.exclude group: 'org.jetbrains' , module:'annotations'
+}
+
+dependencies {
+    implementation(project(":domain"))
+    implementation(project(":data"))
+    implementation(project(":database"))
+
+    def dependencies = rootProject.ext.dependencies
+
+    //Imports do Android
+    implementation dependencies.coreKtx
+    implementation dependencies.appCompact
+    implementation dependencies.materialDesign
+    implementation dependencies.constraintLayout
+    implementation dependencies.lifecycleKtx
+    implementation dependencies.lifecycleExtensions
+    implementation dependencies.liveData
+
+    //Coroutines
+    implementation dependencies.coroutineCore
+    implementation dependencies.coroutineAndroid
+
+    //SDP
+    implementation dependencies.SPD
+
+    //Koin
+    implementation dependencies.koinCore
+    implementation dependencies.koinAndroid
+
+    //Room
+    implementation dependencies.roomRuntime
+    implementation dependencies.roomKtx
+    implementation dependencies.roomCompiler
+    implementation dependencies.roomTesting
+    kapt "androidx.room:room-compiler: 2.5.2"
+
+
+    // Retrofit + OkHttp
+    implementation dependencies.retrofit2Retrofit
+    implementation dependencies.gsonConverter
+    implementation dependencies.okHttp
+    implementation dependencies.retrofitCoroutines
+
+    //Mockk, JUNIT, Assertk e Expresso
+    testImplementation testJunit
+    testImplementation testMockk
+    testImplementation testAssertk
+    testImplementation testKotlinxCoroutines
+    androidTestImplementation androidTestJunit
+    androidTestImplementation androidTestExpresso
+
+
+}
