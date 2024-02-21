@@ -1,6 +1,8 @@
 package com.n0stalgiaultra.activities
 
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -102,6 +104,16 @@ class PhotoActivity : AppCompatActivity() {
                     val msg = "Foto capturada: $savedUri"
                     Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
                     Log.d("Camera", msg)
+
+                    val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
+
+                    //Passa o bitmap via Intent para exibir na tela
+                    val intent = Intent(this@PhotoActivity, ShowPhotoActivity::class.java)
+                    intent.putExtra(
+                        "photoUri",
+                        savedUri.toString()
+                    )
+                    startActivity(intent)
                 }
 
                 override fun onError(exception: ImageCaptureException) {
