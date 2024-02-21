@@ -113,6 +113,7 @@ class PhotoActivity : AppCompatActivity() {
                         "photoUri",
                         savedUri.toString()
                     )
+                    intent.putExtra("photoBitmap", bitmap)
                     startActivity(intent)
                 }
 
