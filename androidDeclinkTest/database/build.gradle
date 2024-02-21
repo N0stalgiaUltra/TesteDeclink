@@ -1,12 +1,13 @@
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
-    id 'kotlin-kapt'
 }
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
     namespace = "com.n0stalgiaultra.database"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 25
@@ -29,6 +30,10 @@ android {
         jvmTarget = "17"
     }
 }
+configurations {
+    cleanedAnnotations
+    implementation.exclude group: 'org.jetbrains' , module:'annotations'
+}
 
 dependencies {
     implementation(project(":domain"))
@@ -37,8 +42,8 @@ dependencies {
     def dependencies = rootProject.ext.dependencies
     implementation dependencies.roomRuntime
     implementation dependencies.roomKtx
-    implementation dependencies.gsonConverter
-    kapt "androidx.room:room-compiler:2.5.2"
+    implementation dependencies.roomTesting
+    kapt 'androidx.room:room-compiler:2.6.1'
 
     implementation dependencies.jsonSerialization
 
