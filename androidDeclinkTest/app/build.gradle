@@ -98,7 +98,9 @@ dependencies {
     implementation dependencies.roomTesting
     kapt 'androidx.room:room-compiler:2.6.1'
 
-
+    //Glide
+    implementation 'com.github.bumptech.glide:glide:4.12.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
 
     // Retrofit + OkHttp
     implementation dependencies.retrofit2Retrofit

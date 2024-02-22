@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.hardware.camera2.CameraManager
 import android.location.LocationManager
 import android.net.ConnectivityManager
@@ -15,20 +16,27 @@ import android.net.wifi.WifiManager
 import android.os.BatteryManager
 import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.provider.Settings
+import android.text.format.Formatter
 import android.util.Base64
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.n0stalgiaultra.androidtest.databinding.ActivityShowPhotoBinding
+import com.n0stalgiaultra.utils.adjustBitmap
 import com.n0stalgiaultra.viewModel.PhotoDataViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.ByteArrayOutputStream
 import java.math.BigInteger
 import java.net.InetAddress
 import java.net.URI
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import java.util.Calendar
 
 class ShowPhotoActivity : AppCompatActivity() {
@@ -44,20 +52,34 @@ class ShowPhotoActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onStart() {
         super.onStart()
-        val extras = intent.extras
 
-        if(extras != null ){
-            val bitmap: Bitmap? = extras.getParcelable("bitmap")
-            val photoUriString = intent.getStringExtra("photoUri")
-            val photoUri = Uri.parse(photoUriString)
+        val uri = Uri.parse(intent.extras?.getString("uri"))
+        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
+//        var bitmap: Bitmap? = null
+//        val filename = intent.getStringExtra("photoBitmap")
+//
+//        try{
+//            val fileInputStream = openFileInput(filename)
+//            bitmap = BitmapFactory.decodeStream(fileInputStream)
+//            fileInputStream.close()
+//        }catch (e: Exception){
+//            e.printStackTrace()
+//        }
+//            val photoUriString = intent.getStringExtra("photoUri")
+//            val photoUri = Uri.parse(photoUriString)
+//
+//            binding.cameraImageView.setImageURI(
+//                photoUri
+//            )
+        val newBitmap = adjustBitmap(bitmap)
+        Glide.with(this)
+            .load(newBitmap) // Sua imagem Bitmap
+            .diskCacheStrategy(DiskCacheStrategy.NONE)
+            .skipMemoryCache(true)
+            .into(binding.cameraImageView)
 
-            binding.cameraImageView.setImageURI(
-                photoUri
-            )
-
-            if (bitmap != null) {
-                getInfo(bitmap)
-            }
+        if (bitmap != null) {
+            getInfo(newBitmap)
         }
 
         binding.buttonNewPhoto.setOnClickListener {
@@ -94,7 +116,7 @@ class ShowPhotoActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                100
+                10
             )
         }
 
@@ -114,7 +136,7 @@ class ShowPhotoActivity : AppCompatActivity() {
         Log.d("INFO", "Fabricante do dispositivo: $manufacturer")
 
         // Versão
-        val version = Build.VERSION.SDK_INT
+        val version = Build.VERSION.RELEASE
         Log.d("INFO", "Versão do Android: $version")
 
         // Nível API
@@ -137,10 +159,14 @@ class ShowPhotoActivity : AppCompatActivity() {
         Log.d("INFO", "Tipo de conexão: $connectionType")
 
         // IP
-        val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        val ipAddress = wifiManager.connectionInfo.ipAddress
-        val ipString = InetAddress.getByName(
-            BigInteger.valueOf(ipAddress.toLong()).toByteArray().toString()
+        val wifiManager = getSystemService(Context.WIFI_SERVICE) as WifiManager
+        //Formatter.formatIpAddress(wifiManager.connectionInfo.ipAddress)
+        val ipString = InetAddress.getByAddress(
+            ByteBuffer
+                .allocate(Integer.BYTES)
+                .order(ByteOrder.LITTLE_ENDIAN)
+                .putInt(wifiManager.connectionInfo.ipAddress)
+                .array()
         ).hostAddress
         Log.d("INFO", "IP do dispositivo: $ipString")
 
