@@ -1,5 +1,6 @@
 package com.n0stalgiaultra.viewModel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -18,15 +19,32 @@ class PhotoDataViewModel(
     private val getAllPhotoDataUseCase: GetAllPhotoDataUseCase
 ) : ViewModel() {
 
-    private val _photoDataList = MutableLiveData<List<PhotoModel>>()
-    val photoDataList : LiveData<List<PhotoModel>> get() = _photoDataList
+    private val _photoDataList = MutableLiveData<List<PhotoModel>?>()
+    val photoDataList : LiveData<List<PhotoModel>?> get() = _photoDataList
+    private lateinit var localPhotoModel : PhotoModel
 
+    suspend fun insertPhotoData(photoModel: PhotoModel){
+        localPhotoModel = photoModel
 
-    suspend fun insertPhotoData(photoData: PhotoModel){
         viewModelScope.launch {
             withContext(Dispatchers.IO){
-                insertPhotoDataUseCase(photoData)
+                insertPhotoDataUseCase(photoModel)
             }
+            // Após a inserção bem-sucedida, recuperamos os dados
+            getAllPhotoData()
+        }
+        Log.d("ViewModel", "item inserido")
+        Log.d("ViewModel", localPhotoModel.DATA_HORA.toString())
+    }
+
+    private fun getAllPhotoData(){
+        _photoDataList.postValue(emptyList())
+        viewModelScope.launch {
+            withContext(Dispatchers.IO){
+                _photoDataList.postValue(getAllPhotoDataUseCase())
+            }
+//            Log.d("ViewModel", _photoDataList.value!!.size.toString())
+            prepareToSendData()
         }
     }
 
@@ -38,9 +56,20 @@ class PhotoDataViewModel(
         }
     }
 
-}
+    private fun prepareToSendData(){
+        for(item in _photoDataList.value!!){
+            if(localPhotoModel.DATA_HORA == item.DATA_HORA &&
+                localPhotoModel.CAMERA == item.CAMERA &&
+                localPhotoModel.IP_EQUIPAMENTO == item.IP_EQUIPAMENTO
+            ){
 
-// tira foto
-// recebe dados
-// guarda em obj
-// salva no BD.
+                Log.d("ViewModel", "ENCONTREI!")
+                localPhotoModel.ID_CAPTURA = item.ID_CAPTURA
+                return
+            }
+        }
+
+        Log.d("ViewModel", localPhotoModel.ID_CAPTURA.toString())
+    }
+
+}

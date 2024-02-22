@@ -2,7 +2,7 @@ package com.n0stalgiaultra.domain.model
 
 
 data class PhotoModel(
-    val ID_CAPTURA : Int = 0,
+    var ID_CAPTURA : Int = 0,
     val DATA_HORA: String,
     val EQUIPAMENTO : String,
     val CAMERA : String,
@@ -17,4 +17,10 @@ data class PhotoModel(
     val IP_EQUIPAMENTO: String,
     val TRANSMITIDO: Int,
     val PERCENTUAL_BATERIA: Int
-)
+){
+    fun equals(other: PhotoModel?): Boolean {
+        return this.CAMERA == other?.CAMERA &&
+                this.DATA_HORA == other?.DATA_HORA &&
+                this.LATITUDE == other?.LATITUDE && this.LONGITUDE == other?.LONGITUDE
+    }
+}

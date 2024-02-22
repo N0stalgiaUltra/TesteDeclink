@@ -60,15 +60,6 @@ class PhotoActivity : AppCompatActivity() {
     private fun startCamera(){
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         var cameraSelector : CameraSelector
-//        binding.toggleCameraButton.setOnCheckedChangeListener { _, isChecked ->
-//            cameraSelector = if(isChecked){
-//                CameraSelector.DEFAULT_FRONT_CAMERA
-//            }else{
-//                CameraSelector.DEFAULT_BACK_CAMERA
-//            }
-//            Log.e("Camera", cameraSelector.toString())
-
-//        }
 
         cameraProviderFuture.addListener({
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
@@ -78,9 +69,6 @@ class PhotoActivity : AppCompatActivity() {
             }
 
             imageCapture = ImageCapture.Builder().build()
-
-
-
 
             try{
                 cameraProvider.unbindAll()
