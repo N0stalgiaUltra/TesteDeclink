@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.hardware.camera2.CameraManager
 import android.location.LocationManager
 import android.net.ConnectivityManager
@@ -18,26 +17,24 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.Settings
-import android.text.format.Formatter
 import android.util.Base64
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.n0stalgiaultra.androidtest.databinding.ActivityShowPhotoBinding
+import com.n0stalgiaultra.utils.addWatermark
 import com.n0stalgiaultra.utils.adjustBitmap
 import com.n0stalgiaultra.viewModel.PhotoDataViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.ByteArrayOutputStream
-import java.math.BigInteger
 import java.net.InetAddress
-import java.net.URI
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import java.util.Calendar
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class ShowPhotoActivity : AppCompatActivity() {
 
@@ -55,31 +52,18 @@ class ShowPhotoActivity : AppCompatActivity() {
 
         val uri = Uri.parse(intent.extras?.getString("uri"))
         val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
-//        var bitmap: Bitmap? = null
-//        val filename = intent.getStringExtra("photoBitmap")
-//
-//        try{
-//            val fileInputStream = openFileInput(filename)
-//            bitmap = BitmapFactory.decodeStream(fileInputStream)
-//            fileInputStream.close()
-//        }catch (e: Exception){
-//            e.printStackTrace()
-//        }
-//            val photoUriString = intent.getStringExtra("photoUri")
-//            val photoUri = Uri.parse(photoUriString)
-//
-//            binding.cameraImageView.setImageURI(
-//                photoUri
-//            )
-        val newBitmap = adjustBitmap(bitmap)
-        Glide.with(this)
-            .load(newBitmap) // Sua imagem Bitmap
-            .diskCacheStrategy(DiskCacheStrategy.NONE)
-            .skipMemoryCache(true)
-            .into(binding.cameraImageView)
+
+        val adjustedBitmap = adjustBitmap(bitmap) //ajusta tamanho e escalonamento
+        val finalBitmap = addWatermark(adjustedBitmap) // adiciona watermark
+
+        adjustedBitmap.recycle()
+
+        binding.cameraImageView.setImageBitmap(
+            finalBitmap
+        )
 
         if (bitmap != null) {
-            getInfo(newBitmap)
+            getInfo(finalBitmap)
         }
 
         binding.buttonNewPhoto.setOnClickListener {
@@ -91,7 +75,9 @@ class ShowPhotoActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun getInfo(bitmap: Bitmap) {
         // Hora atual
-        val currentTime = Calendar.getInstance().time
+        val currentTime = SimpleDateFormat(
+            "yyyy/MM/dd HH:mm:ss",
+            Locale.getDefault()).format(Date(System.currentTimeMillis()))
         Log.d("INFO", "Hora atual: $currentTime")
 
         // Imei ou SecureId
