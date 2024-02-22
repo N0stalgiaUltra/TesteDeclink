@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
 import android.location.LocationManager
 import android.net.ConnectivityManager
@@ -21,12 +22,17 @@ import android.util.Base64
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.camera.core.CameraSelector
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.n0stalgiaultra.androidtest.databinding.ActivityShowPhotoBinding
+import com.n0stalgiaultra.domain.model.PhotoModel
 import com.n0stalgiaultra.utils.addWatermark
 import com.n0stalgiaultra.utils.adjustBitmap
 import com.n0stalgiaultra.viewModel.PhotoDataViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.ByteArrayOutputStream
 import java.net.InetAddress
@@ -49,21 +55,22 @@ class ShowPhotoActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onStart() {
         super.onStart()
-
         val uri = Uri.parse(intent.extras?.getString("uri"))
+        val camera = intent.extras?.getString("camera")
         val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
 
         val adjustedBitmap = adjustBitmap(bitmap) //ajusta tamanho e escalonamento
         val finalBitmap = addWatermark(adjustedBitmap) // adiciona watermark
 
-        adjustedBitmap.recycle()
-
         binding.cameraImageView.setImageBitmap(
             finalBitmap
         )
 
-        if (bitmap != null) {
-            getInfo(finalBitmap)
+        if (finalBitmap != null) {
+           val photoModel = getInfo(finalBitmap, camera!!)
+            CoroutineScope(Dispatchers.IO).launch {
+                viewModel.insertPhotoData(photoModel)
+            }
         }
 
         binding.buttonNewPhoto.setOnClickListener {
@@ -73,7 +80,7 @@ class ShowPhotoActivity : AppCompatActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun getInfo(bitmap: Bitmap) {
+    private fun getInfo(bitmap: Bitmap, cameraSelector: String) : PhotoModel{
         // Hora atual
         val currentTime = SimpleDateFormat(
             "yyyy/MM/dd HH:mm:ss",
@@ -85,17 +92,17 @@ class ShowPhotoActivity : AppCompatActivity() {
         Log.d("INFO", "Secure ID: $secureId")
 
         // Camera
-        val cameraManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
-        val cameraList = cameraManager.cameraIdList
-        Log.d("INFO", "Câmeras disponíveis: ${cameraList.joinToString()}")
+        Log.d("INFO", "Câmera $cameraSelector")
 
         // Latitude e Longitude
+        var latitude: Double = 0.0
+        var longitude: Double = 0.0
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             // Permissão já concedida, pode obter a localização
             val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
             val lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-            val latitude = lastKnownLocation?.latitude
-            val longitude = lastKnownLocation?.longitude
+            latitude = lastKnownLocation?.latitude!!
+            longitude = lastKnownLocation?.longitude!!
             Log.d("INFO", "Latitude: $latitude, Longitude: $longitude")
         } else {
             // Permissão ainda não foi concedida, solicite-a ao usuário
@@ -169,6 +176,24 @@ class ShowPhotoActivity : AppCompatActivity() {
             (level * 100 / scale.toFloat()).toInt()
         } ?: -1
         Log.d("INFO", "Percentual de bateria: $batteryLevel")
+
+         return PhotoModel(
+            DATA_HORA = currentTime,
+            EQUIPAMENTO = secureId,
+            CAMERA = cameraSelector,
+            LATITUDE = latitude,
+            LONGITUDE = longitude,
+            IMAGEM = base64Image,
+            MODELO = model,
+            FABRICANTE = manufacturer,
+            VERSAO = version,
+            NIVEL_API = apiLvl,
+            TIPO_CONEXAO = connectionType,
+            IP_EQUIPAMENTO = ipString!!,
+            TRANSMITIDO = transmitted,
+            PERCENTUAL_BATERIA = batteryLevel
+        )
+
     }
 
 

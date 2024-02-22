@@ -2,7 +2,7 @@ package com.n0stalgiaultra.domain.model
 
 
 data class PhotoModel(
-    val ID_CAPTURA : Int,
+    val ID_CAPTURA : Int = 0,
     val DATA_HORA: String,
     val EQUIPAMENTO : String,
     val CAMERA : String,

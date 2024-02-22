@@ -18,18 +18,14 @@ class PhotoDataViewModel(
     private val getAllPhotoDataUseCase: GetAllPhotoDataUseCase
 ) : ViewModel() {
 
-    // um objeto, apenas
-    private val _photoData = MutableLiveData<PhotoModel>()
-    val photoData : LiveData<PhotoModel> get() = _photoData
-
     private val _photoDataList = MutableLiveData<List<PhotoModel>>()
     val photoDataList : LiveData<List<PhotoModel>> get() = _photoDataList
 
 
-    suspend fun insertPhotoData(){
+    suspend fun insertPhotoData(photoData: PhotoModel){
         viewModelScope.launch {
             withContext(Dispatchers.IO){
-                photoData.value?.let { insertPhotoDataUseCase(it) }
+                insertPhotoDataUseCase(photoData)
             }
         }
     }
@@ -41,6 +37,7 @@ class PhotoDataViewModel(
             }
         }
     }
+
 }
 
 // tira foto

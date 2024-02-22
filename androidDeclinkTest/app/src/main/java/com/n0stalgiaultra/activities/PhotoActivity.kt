@@ -59,6 +59,16 @@ class PhotoActivity : AppCompatActivity() {
 
     private fun startCamera(){
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+        var cameraSelector : CameraSelector
+//        binding.toggleCameraButton.setOnCheckedChangeListener { _, isChecked ->
+//            cameraSelector = if(isChecked){
+//                CameraSelector.DEFAULT_FRONT_CAMERA
+//            }else{
+//                CameraSelector.DEFAULT_BACK_CAMERA
+//            }
+//            Log.e("Camera", cameraSelector.toString())
+
+//        }
 
         cameraProviderFuture.addListener({
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
@@ -69,10 +79,16 @@ class PhotoActivity : AppCompatActivity() {
 
             imageCapture = ImageCapture.Builder().build()
 
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+
+
 
             try{
                 cameraProvider.unbindAll()
+                cameraSelector = if (binding.toggleCameraButton.isChecked) {
+                    CameraSelector.DEFAULT_FRONT_CAMERA
+                } else {
+                    CameraSelector.DEFAULT_BACK_CAMERA
+                }
 
                 val camera = cameraProvider.bindToLifecycle(
                     this, cameraSelector, preview, imageCapture
@@ -81,6 +97,10 @@ class PhotoActivity : AppCompatActivity() {
                 Log.e("Camera", "Erro ao iniciar camera", e)
             }
         }, ContextCompat.getMainExecutor(this))
+
+        binding.toggleCameraButton.setOnCheckedChangeListener { _, isChecked ->
+            startCamera()
+        }
     }
 
     private fun takePhoto(){
@@ -104,8 +124,10 @@ class PhotoActivity : AppCompatActivity() {
                     Log.d("Camera", msg)
 
                     val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
+
                     val intent = Intent(this@PhotoActivity, ShowPhotoActivity::class.java)
                     intent.putExtra("uri", savedUri.toString())
+                    intent.putExtra("camera", if(binding.toggleCameraButton.isChecked) "Camera Frontal" else "Camera Traseira")
                     startActivity(intent)
 
                 }
