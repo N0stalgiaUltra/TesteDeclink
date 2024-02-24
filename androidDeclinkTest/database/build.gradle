@@ -37,9 +37,13 @@ configurations {
 
 dependencies {
     implementation(project(":domain"))
+    implementation 'androidx.test.ext:junit-ktx:1.1.5'
+
 
 
     def dependencies = rootProject.ext.dependencies
+
+
     implementation dependencies.roomRuntime
     implementation dependencies.roomKtx
     implementation dependencies.roomTesting
@@ -51,4 +55,10 @@ dependencies {
     testImplementation testKotlinxCoroutines
     testImplementation testMockk
     testImplementation testJunit
+//    androidTestImplementation dependencies.androidTestJunit
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+
+    androidTestImplementation "androidx.test.espresso:espresso-core:3.5.1"
+    androidTestImplementation 'androidx.test:runner:1.4.0'
+
 }

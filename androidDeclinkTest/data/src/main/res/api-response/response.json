@@ -1,0 +1,17 @@
+{
+  "ID_CAPTURA": 1,
+  "DATA_HORA": "03/02/1998",
+  "EQUIPAMENTO": "secureId",
+  "CAMERA": "Frontal",
+  "LATITUDE": 1.1,
+  "LONGITUDE": 0.1,
+  "IMAGEM": "Imagem em Base64",
+  "MODELO": "iMock",
+  "FABRICANTE": "Apple Mock",
+  "VERSAO": "11",
+  "NIVEL_API": 28,
+  "TIPO_CONEXAO": "Wi-fi",
+  "IP_EQUIPAMENTO": "111.111.111.11",
+  "TRANSMITIDO": 0,
+  "PERCENTUAL_BATERIA": 100
+}

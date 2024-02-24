@@ -112,6 +112,8 @@ dependencies {
     testImplementation testKotlinxCoroutines
     androidTestImplementation androidTestJunit
     androidTestImplementation androidTestExpresso
+    testImplementation 'com.squareup.okhttp3:mockwebserver:4.9.1'
+
 
 
 }

@@ -1,6 +1,7 @@
 package com.n0stalgiaultra.domain.repository
 
-interface RemoteRepository {
+import com.n0stalgiaultra.domain.model.PhotoModel
 
-    suspend fun sendDataToRemote()
+interface RemoteRepository {
+    suspend fun sendDataToRemote(photoData: PhotoModel)
 }

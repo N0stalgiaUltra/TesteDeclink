@@ -42,4 +42,6 @@ ext{
     testKotlinxCoroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4"
     androidTestJunit = "androidx.test.ext:junit:1.1.5"
     androidTestExpresso = "androidx.test.espresso:espresso-core:3.5.1"
+    androidTestRunner = 'androidx.test:runner:1.4.0'
+
 }

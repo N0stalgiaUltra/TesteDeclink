@@ -25,4 +25,12 @@ class LocalDataSourceImpl(private val dao: PhotoEntityDAO) : LocalDataSource {
     override suspend fun getData(id: Int): PhotoModel {
         return dao.getData(id).toModel()
     }
+
+    override suspend fun transmittedItem(id: Int) {
+        try{
+            dao.transmittedItem(id)
+        } catch (e: Exception){
+            Log.e("LocalDataSource", "Erro de mudança de dados", e)
+        }
+    }
 }

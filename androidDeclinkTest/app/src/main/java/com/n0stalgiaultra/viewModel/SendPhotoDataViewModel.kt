@@ -7,35 +7,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.n0stalgiaultra.domain.model.PhotoModel
 import com.n0stalgiaultra.domain.usecases.GetAllPhotoDataUseCase
-import com.n0stalgiaultra.domain.usecases.GetPhotoDataUseCase
-import com.n0stalgiaultra.domain.usecases.InsertPhotoDataUseCase
+import com.n0stalgiaultra.domain.usecases.SendRemoteDataUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class PhotoDataViewModel(
-    private val insertPhotoDataUseCase: InsertPhotoDataUseCase,
-    private val getPhotoDataUseCase: GetPhotoDataUseCase,
-    private val getAllPhotoDataUseCase: GetAllPhotoDataUseCase
+class SendPhotoDataViewModel(
+    private val getAllPhotoDataUseCase: GetAllPhotoDataUseCase,
+    private val sendRemoteDataUseCase: SendRemoteDataUseCase,
 ) : ViewModel() {
-
     private val _photoDataList = MutableLiveData<List<PhotoModel>?>()
-    val photoDataList : LiveData<List<PhotoModel>?> get() = _photoDataList
-    private lateinit var localPhotoModel : PhotoModel
-
-    suspend fun insertPhotoData(photoModel: PhotoModel){
-        localPhotoModel = photoModel
-
-        viewModelScope.launch {
-            withContext(Dispatchers.IO){
-                insertPhotoDataUseCase(photoModel)
-            }
-            // Após a inserção bem-sucedida, recuperamos os dados
-            getAllPhotoData()
-        }
-        Log.d("ViewModel", "item inserido")
-        Log.d("ViewModel", localPhotoModel.DATA_HORA.toString())
-    }
+    lateinit var localPhotoModel : PhotoModel
 
     private fun getAllPhotoData(){
         _photoDataList.postValue(emptyList())
@@ -43,16 +25,7 @@ class PhotoDataViewModel(
             withContext(Dispatchers.IO){
                 _photoDataList.postValue(getAllPhotoDataUseCase())
             }
-//            Log.d("ViewModel", _photoDataList.value!!.size.toString())
             prepareToSendData()
-        }
-    }
-
-    suspend fun getPhotoData(){
-        viewModelScope.launch {
-            withContext(Dispatchers.IO){
-                val result = getPhotoDataUseCase(0)
-            }
         }
     }
 
@@ -69,7 +42,18 @@ class PhotoDataViewModel(
             }
         }
 
+        if(localPhotoModel.ID_CAPTURA != 0)
+            sendData()
         Log.d("ViewModel", localPhotoModel.ID_CAPTURA.toString())
     }
 
+    private fun sendData(){
+        viewModelScope.launch {
+            withContext(Dispatchers.IO){
+                sendRemoteDataUseCase(localPhotoModel)
+                Log.d("ViewModel", "Tentativa de envio dos dados")
+                // TODO: DEPENDENDO DA RESPOSTA, ADICIONAR UM TOAST AVISANDO SE O ITEM FOI OU NÃO ENVIADO
+            }
+        }
+    }
 }

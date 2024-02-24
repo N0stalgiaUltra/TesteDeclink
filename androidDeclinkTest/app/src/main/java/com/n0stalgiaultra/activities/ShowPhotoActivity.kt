@@ -6,8 +6,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.hardware.camera2.CameraCharacteristics
-import android.hardware.camera2.CameraManager
 import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -22,14 +20,14 @@ import android.util.Base64
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.CameraSelector
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.n0stalgiaultra.androidtest.databinding.ActivityShowPhotoBinding
 import com.n0stalgiaultra.domain.model.PhotoModel
 import com.n0stalgiaultra.utils.addWatermark
 import com.n0stalgiaultra.utils.adjustBitmap
-import com.n0stalgiaultra.viewModel.PhotoDataViewModel
+import com.n0stalgiaultra.viewModel.SavePhotoDataViewModel
+import com.n0stalgiaultra.viewModel.SendPhotoDataViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -44,7 +42,8 @@ import java.util.Locale
 
 class ShowPhotoActivity : AppCompatActivity() {
 
-    private val viewModel: PhotoDataViewModel by viewModel()
+    private val savePhotoViewModel: SavePhotoDataViewModel by viewModel()
+    private val sendPhotoViewModel: SendPhotoDataViewModel by viewModel()
     private lateinit var binding: ActivityShowPhotoBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,8 +67,9 @@ class ShowPhotoActivity : AppCompatActivity() {
 
         if (finalBitmap != null) {
            val photoModel = getInfo(finalBitmap, camera!!)
+            sendPhotoViewModel.localPhotoModel = photoModel
             CoroutineScope(Dispatchers.IO).launch {
-                viewModel.insertPhotoData(photoModel)
+                savePhotoViewModel.insertPhotoData(photoModel)
             }
         }
 
