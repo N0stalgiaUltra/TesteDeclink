@@ -39,6 +39,18 @@ class PhotoActivity : AppCompatActivity() {
         //inicia executor da camera
         cameraExecutor = Executors.newSingleThreadExecutor()
 
+
+    }
+
+    override fun onStart() {
+        super.onStart()
+        binding.cameraButton.setOnClickListener {
+            takePhoto()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
         if(allPermissionsGranted())
             startCamera()
         else{
@@ -49,14 +61,6 @@ class PhotoActivity : AppCompatActivity() {
             )
         }
     }
-
-    override fun onStart() {
-        super.onStart()
-        binding.cameraButton.setOnClickListener {
-            takePhoto()
-        }
-    }
-
     private fun startCamera(){
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         var cameraSelector : CameraSelector
@@ -149,7 +153,10 @@ class PhotoActivity : AppCompatActivity() {
     companion object{
         private const val TAG = "CameraX"
         private const val REQUEST_CODE_PERMISSIONS = 10
-        private val REQUIRED_PERMISSIONS = arrayOf(android.Manifest.permission.CAMERA, android.Manifest.permission.ACCESS_FINE_LOCATION)
+        private val REQUIRED_PERMISSIONS = arrayOf(
+            android.Manifest.permission.CAMERA,
+            android.Manifest.permission.ACCESS_FINE_LOCATION,
+            android.Manifest.permission.ACCESS_COARSE_LOCATION)
     }
 
 }

@@ -6,7 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.location.LocationManager
+import android.location.Location
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
@@ -22,12 +22,14 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.n0stalgiaultra.androidtest.databinding.ActivityShowPhotoBinding
 import com.n0stalgiaultra.database.exportDatabase
 import com.n0stalgiaultra.domain.model.PhotoModel
 import com.n0stalgiaultra.utils.addWatermark
 import com.n0stalgiaultra.utils.adjustBitmap
+import com.n0stalgiaultra.utils.getLastLocation
 import com.n0stalgiaultra.utils.isDeviceConnected
 import com.n0stalgiaultra.viewModel.SavePhotoDataViewModel
 import com.n0stalgiaultra.viewModel.SendPhotoDataViewModel
@@ -49,42 +51,43 @@ class ShowPhotoActivity : AppCompatActivity() {
     private val sendPhotoViewModel: SendPhotoDataViewModel by viewModel()
 
     private lateinit var binding: ActivityShowPhotoBinding
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityShowPhotoBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onStart() {
         super.onStart()
         val uri = Uri.parse(intent.extras?.getString("uri"))
-        val camera = intent.extras?.getString("camera")
+        val camera = intent.extras?.getString("camera").toString()
         val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
 
-        val adjustedBitmap = adjustBitmap(bitmap) //ajusta tamanho e escalonamento
+        //val adjustedBitmap = adjustBitmap(bitmap) //ajusta tamanho e escalonamento
+        val adjustedBitmap = Bitmap.createBitmap(bitmap).copy(Bitmap.Config.ARGB_8888, true)//ajusta tamanho e escalonamento
         val finalBitmap = addWatermark(adjustedBitmap) // adiciona watermark
 
         binding.cameraImageView.setImageBitmap(
             finalBitmap
         )
 
-        if (finalBitmap != null) {
-           val photoModel = getInfo(finalBitmap, camera!!)
-            sendPhotoViewModel.localPhotoModel = photoModel
-
-            CoroutineScope(Dispatchers.IO).launch {
-                savePhotoViewModel.insertPhotoData(photoModel)
-            }
-
-
-
-        }
 
         binding.buttonNewPhoto.setOnClickListener {
             finish()
         }
+        if(finalBitmap!=null) {
+            CoroutineScope(Dispatchers.IO).launch {
+                val photoModel = getInfo(finalBitmap, camera)
+                sendPhotoViewModel.localPhotoModel = photoModel
+                savePhotoViewModel.insertPhotoData(photoModel)
 
+            }
+        }
         binding.buttonExportDatabase.setOnClickListener {
             val message = exportDatabase(applicationContext)
             Toast.makeText(
@@ -121,8 +124,9 @@ class ShowPhotoActivity : AppCompatActivity() {
 
     }
 
+
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun getInfo(bitmap: Bitmap, cameraSelector: String) : PhotoModel{
+    private suspend fun getInfo(bitmap: Bitmap, cameraSelector: String) : PhotoModel{
         // Hora atual
         val currentTime = SimpleDateFormat(
             "yyyy/MM/dd HH:mm:ss",
@@ -137,23 +141,10 @@ class ShowPhotoActivity : AppCompatActivity() {
         Log.d("INFO", "Câmera $cameraSelector")
 
         // Latitude e Longitude
-        var latitude: Double = 0.0
-        var longitude: Double = 0.0
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            // Permissão já concedida, pode obter a localização
-            val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-            val lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-            latitude = lastKnownLocation?.latitude!!
-            longitude = lastKnownLocation?.longitude!!
-            Log.d("INFO", "Latitude: $latitude, Longitude: $longitude")
-        } else {
-            // Permissão ainda não foi concedida, solicite-a ao usuário
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                10
-            )
-        }
+
+
+        val (latitude, longitude) = getLastLocation(this, fusedLocationClient)
+        Log.d("INFO", "Latitude: $latitude, Longitude: $longitude")
 
         // Imagem Base64
         val outputStream = ByteArrayOutputStream()

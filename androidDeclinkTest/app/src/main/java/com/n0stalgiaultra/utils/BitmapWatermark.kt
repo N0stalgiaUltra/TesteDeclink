@@ -13,13 +13,13 @@ fun addWatermark(bitmap: Bitmap): Bitmap{
     val paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     paint.color = Color.YELLOW
-    paint.textSize = 30f
+    paint.textSize = 100f
 
     val currentDateTime = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault())
         .format(Date(System.currentTimeMillis()))
 
-    val x = bitmap.width - 450f
-    val y = bitmap.height - 50f
+    val x = bitmap.width - 1000f
+    val y = bitmap.height - 20f
 
     canvas.drawText(
         currentDateTime,
