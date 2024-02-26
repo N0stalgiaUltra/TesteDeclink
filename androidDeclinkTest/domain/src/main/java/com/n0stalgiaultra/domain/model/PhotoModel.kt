@@ -17,10 +17,4 @@ data class PhotoModel(
     val IP_EQUIPAMENTO: String,
     val TRANSMITIDO: Int,
     val PERCENTUAL_BATERIA: Int
-){
-    fun equals(other: PhotoModel?): Boolean {
-        return this.CAMERA == other?.CAMERA &&
-                this.DATA_HORA == other?.DATA_HORA &&
-                this.LATITUDE == other?.LATITUDE && this.LONGITUDE == other?.LONGITUDE
-    }
-}
+)

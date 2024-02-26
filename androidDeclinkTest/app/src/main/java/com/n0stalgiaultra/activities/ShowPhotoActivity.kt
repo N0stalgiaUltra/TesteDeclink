@@ -1,12 +1,9 @@
 package com.n0stalgiaultra.activities
 
-import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.location.Location
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
@@ -21,14 +18,12 @@ import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.n0stalgiaultra.androidtest.databinding.ActivityShowPhotoBinding
 import com.n0stalgiaultra.database.exportDatabase
 import com.n0stalgiaultra.domain.model.PhotoModel
 import com.n0stalgiaultra.utils.addWatermark
-import com.n0stalgiaultra.utils.adjustBitmap
 import com.n0stalgiaultra.utils.getLastLocation
 import com.n0stalgiaultra.utils.isDeviceConnected
 import com.n0stalgiaultra.viewModel.SavePhotoDataViewModel
@@ -68,7 +63,6 @@ class ShowPhotoActivity : AppCompatActivity() {
         val camera = intent.extras?.getString("camera").toString()
         val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
 
-        //val adjustedBitmap = adjustBitmap(bitmap) //ajusta tamanho e escalonamento
         val adjustedBitmap = Bitmap.createBitmap(bitmap).copy(Bitmap.Config.ARGB_8888, true)//ajusta tamanho e escalonamento
         val finalBitmap = addWatermark(adjustedBitmap) // adiciona watermark
 
@@ -141,8 +135,6 @@ class ShowPhotoActivity : AppCompatActivity() {
         Log.d("INFO", "Câmera $cameraSelector")
 
         // Latitude e Longitude
-
-
         val (latitude, longitude) = getLastLocation(this, fusedLocationClient)
         Log.d("INFO", "Latitude: $latitude, Longitude: $longitude")
 

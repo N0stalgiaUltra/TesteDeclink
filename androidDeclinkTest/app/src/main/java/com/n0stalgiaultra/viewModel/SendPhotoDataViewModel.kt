@@ -75,14 +75,4 @@ class SendPhotoDataViewModel(
         Log.e("ViewModel", "Maximo de tenativas excedido")
     }
 
-    /**
-     * Atenção, metodo usado apenas para fins de testes!
-     * */
-    fun sendFakeData(success: Boolean){
-        if(success)
-            _sendDataResult.value = Result.success(Unit)
-        else
-            _sendDataResult.value = Result.failure(Exception("Erro ao enviar os dados"))
-
-    }
 }
