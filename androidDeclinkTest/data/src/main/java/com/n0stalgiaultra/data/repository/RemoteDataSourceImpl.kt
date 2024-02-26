@@ -9,28 +9,23 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class RemoteDataSourceImpl(
-    private val api: PhotoAPI,
-    private val apiHandler: ApiHandler): RemoteDataSource {
+    private val api: PhotoAPI
+    ): RemoteDataSource {
+    private val apiHandler: ApiHandler = ApiHandler()
     override suspend fun sendRemoteData(photoData: PhotoModel): Result<Unit> {
         val dataJson = Gson().toJson(photoData)
         println("Dados JSON: $dataJson")
-        println("Enviando dados para a API...")
 
         val sendData = api.sendData(dataJson)
-        println("Dados Enviados para a API")
         return suspendCoroutine {
             continuation ->
             apiHandler.handleApiCall(sendData,
                 onSuccess = {
                     response ->
-                    println("Resposta da API recebida com sucesso: $response")
-
                     continuation.resume(Result.success(Unit))
                 },
                 onFailure = {
                     throwable ->
-                    println("Erro ao receber resposta da API: $throwable")
-
                     continuation.resume(Result.failure(throwable))
                 })
         }

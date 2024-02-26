@@ -69,10 +69,6 @@ val appModule = module {
         get<Retrofit>().create(PhotoAPI::class.java)
     }
 
-    //instancia da api handler
-    factory {
-        get<ApiHandler>()
-    }
     //Room
     single {
         Room.databaseBuilder(
@@ -90,7 +86,7 @@ val appModule = module {
 
     //RemoteDataSource
     single<RemoteDataSource>{
-        RemoteDataSourceImpl(api = get<PhotoAPI>(), get<ApiHandler>())
+        RemoteDataSourceImpl(api = get<PhotoAPI>())
     }
 
     //LocalDataSource
@@ -116,6 +112,7 @@ val appModule = module {
     factory { GetAllPhotoDataUseCase(get<LocalRepository>()) }
     factory { InsertPhotoDataUseCase(get<LocalRepository>()) }
     factory { GetPhotoDataUseCase(get<LocalRepository>()) }
+    factory { SendRemoteDataUseCase(get<RemoteRepository>())}
 
 
     //ViewModel

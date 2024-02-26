@@ -42,7 +42,6 @@ import java.util.logging.Logger
 class PhotoApiUnitTest {
 
     private lateinit var remoteDataSource: RemoteDataSourceImpl
-    private val apiHandler: ApiHandler = mockk<ApiHandler>(relaxed = true)
     private lateinit var photoApi: PhotoAPI
     private lateinit var mockWebServer: MockWebServer
 
@@ -60,7 +59,7 @@ class PhotoApiUnitTest {
 
         Log.d("PhotoApiUnitTest", "Configurando o teste")
         photoApi = retrofit.create(PhotoAPI::class.java)
-        remoteDataSource = RemoteDataSourceImpl(photoApi, apiHandler)
+        remoteDataSource = RemoteDataSourceImpl(photoApi)
     }
 
     @After

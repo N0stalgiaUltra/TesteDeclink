@@ -1,6 +1,7 @@
 package com.n0stalgiaultra.viewModel
 
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,6 +10,7 @@ import com.n0stalgiaultra.domain.model.PhotoModel
 import com.n0stalgiaultra.domain.usecases.GetAllPhotoDataUseCase
 import com.n0stalgiaultra.domain.usecases.SendRemoteDataUseCase
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -19,7 +21,11 @@ class SendPhotoDataViewModel(
     private val _photoDataList = MutableLiveData<List<PhotoModel>?>()
     lateinit var localPhotoModel : PhotoModel
 
-    private fun getAllPhotoData(){
+    private val _sendDataResult = MutableLiveData<Result<Unit>?>()
+    val sendDataResult: LiveData<Result<Unit>?> get() = _sendDataResult
+
+    /*Como não há API, o envio nunca vai ser sucesso*/
+    fun getAllPhotoData(){
         _photoDataList.postValue(emptyList())
         viewModelScope.launch {
             withContext(Dispatchers.IO){
@@ -38,22 +44,45 @@ class SendPhotoDataViewModel(
 
                 Log.d("ViewModel", "ENCONTREI!")
                 localPhotoModel.ID_CAPTURA = item.ID_CAPTURA
-                return
+                Log.d("ViewModel", localPhotoModel.ID_CAPTURA.toString())
+                break
             }
         }
 
-        if(localPhotoModel.ID_CAPTURA != 0)
-            sendData()
-        Log.d("ViewModel", localPhotoModel.ID_CAPTURA.toString())
+        if(localPhotoModel.ID_CAPTURA != 0){
+            viewModelScope.launch {
+                delay(5000)
+                sendData()
+            }
+        }
     }
 
-    private fun sendData(){
-        viewModelScope.launch {
-            withContext(Dispatchers.IO){
-                sendRemoteDataUseCase(localPhotoModel)
-                Log.d("ViewModel", "Tentativa de envio dos dados")
-                // TODO: DEPENDENDO DA RESPOSTA, ADICIONAR UM TOAST AVISANDO SE O ITEM FOI OU NÃO ENVIADO
+    private suspend fun sendData(){
+        Log.d("ViewModel", "Enviando dados")
+        var currentAttempt = 0
+        val maxAttempts = 5
+        while (currentAttempt < maxAttempts) {
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    _sendDataResult.postValue(sendRemoteDataUseCase(localPhotoModel))
+                    if(_sendDataResult.value?.isFailure == true) {
+                        currentAttempt++
+                        delay(1000)
+                    }
+                }
             }
         }
+        Log.e("ViewModel", "Maximo de tenativas excedido")
+    }
+
+    /**
+     * Atenção, metodo usado apenas para fins de testes!
+     * */
+    fun sendFakeData(success: Boolean){
+        if(success)
+            _sendDataResult.value = Result.success(Unit)
+        else
+            _sendDataResult.value = Result.failure(Exception("Erro ao enviar os dados"))
+
     }
 }

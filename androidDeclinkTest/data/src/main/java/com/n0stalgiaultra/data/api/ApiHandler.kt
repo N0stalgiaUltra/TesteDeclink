@@ -1,5 +1,6 @@
 package com.n0stalgiaultra.data.api
 
+import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -19,7 +20,7 @@ class ApiHandler {
             }
 
             override fun onFailure(call: Call<T>, t: Throwable) {
-                onFailure(t)
+                Log.e("ApiHandler", "Erro", t)
             }
         })
     }

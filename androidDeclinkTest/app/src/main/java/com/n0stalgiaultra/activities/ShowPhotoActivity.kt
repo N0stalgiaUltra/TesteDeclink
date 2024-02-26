@@ -18,14 +18,17 @@ import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Base64
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.n0stalgiaultra.androidtest.databinding.ActivityShowPhotoBinding
+import com.n0stalgiaultra.database.exportDatabase
 import com.n0stalgiaultra.domain.model.PhotoModel
 import com.n0stalgiaultra.utils.addWatermark
 import com.n0stalgiaultra.utils.adjustBitmap
+import com.n0stalgiaultra.utils.isDeviceConnected
 import com.n0stalgiaultra.viewModel.SavePhotoDataViewModel
 import com.n0stalgiaultra.viewModel.SendPhotoDataViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -44,6 +47,7 @@ class ShowPhotoActivity : AppCompatActivity() {
 
     private val savePhotoViewModel: SavePhotoDataViewModel by viewModel()
     private val sendPhotoViewModel: SendPhotoDataViewModel by viewModel()
+
     private lateinit var binding: ActivityShowPhotoBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,13 +72,51 @@ class ShowPhotoActivity : AppCompatActivity() {
         if (finalBitmap != null) {
            val photoModel = getInfo(finalBitmap, camera!!)
             sendPhotoViewModel.localPhotoModel = photoModel
+
             CoroutineScope(Dispatchers.IO).launch {
                 savePhotoViewModel.insertPhotoData(photoModel)
             }
+
+
+
         }
 
         binding.buttonNewPhoto.setOnClickListener {
             finish()
+        }
+
+        binding.buttonExportDatabase.setOnClickListener {
+            val message = exportDatabase(applicationContext)
+            Toast.makeText(
+                this,
+                message.second,
+                Toast.LENGTH_SHORT
+            ).show()
+            Log.d("Database Export", message.second)
+        }
+        binding.buttonSendDetails.setOnClickListener {
+            CoroutineScope(Dispatchers.Main).launch {
+                if(isDeviceConnected(applicationContext))
+                    sendPhotoViewModel.getAllPhotoData()
+                else
+                    Toast.makeText(applicationContext,
+                        "Dispositivo não está conectado à internet",
+                        Toast.LENGTH_SHORT).show()
+            }
+
+            sendPhotoViewModel.sendDataResult.observe(this){
+                    result ->
+                if(result != null) {
+                    if (result.isSuccess)
+                        Toast.makeText(this,
+                            "Envio efetuado com sucesso!",
+                            Toast.LENGTH_SHORT).show()
+                    else
+                        Toast.makeText(this,
+                            "Erro ao enviar, tente novamente!",
+                            Toast.LENGTH_SHORT).show()
+                }
+            }
         }
 
     }

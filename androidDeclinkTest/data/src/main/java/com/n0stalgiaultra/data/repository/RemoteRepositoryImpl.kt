@@ -9,10 +9,12 @@ class RemoteRepositoryImpl(
     private val remoteDataSource: RemoteDataSource,
     private val localDataSource: LocalDataSource
 ) : RemoteRepository {
-    override suspend fun sendDataToRemote(photoData: PhotoModel) {
+    override suspend fun sendDataToRemote(photoData: PhotoModel) : Result<Unit> {
         val result = remoteDataSource.sendRemoteData(photoData)
         if(result.isSuccess)
             localDataSource.transmittedItem(photoData.ID_CAPTURA)
+
+        return result
 
     }
 }

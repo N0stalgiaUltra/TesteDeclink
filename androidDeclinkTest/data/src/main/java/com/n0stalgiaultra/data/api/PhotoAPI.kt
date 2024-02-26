@@ -9,6 +9,6 @@ interface PhotoAPI {
     fun sendData(@Body data: String): Call<Void>
 
     companion object{
-        const val BASE_URL = "rota_a_ser_definida"
+        const val BASE_URL = "https://www.declink.com/sua-rota-aqui/"
     }
 }

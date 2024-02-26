@@ -24,14 +24,27 @@
         />
 
     <Button
-        android:id="@+id/button_showDetails"
+        android:id="@+id/button_sendDetails"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/_75sdp"
-        android:text="Mostrar Detalhes"
+        android:text="Enviar dados"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias=".1"
+        />
+  <Button
+        android:id="@+id/button_exportDatabase"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/_75sdp"
+        android:text="Exportar dados do BD"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias=".9"
+      />
 
     <Button
         android:id="@+id/button_newPhoto"
