@@ -24,6 +24,7 @@ import com.n0stalgiaultra.androidtest.databinding.ActivityShowPhotoBinding
 import com.n0stalgiaultra.database.exportDatabase
 import com.n0stalgiaultra.domain.model.PhotoModel
 import com.n0stalgiaultra.utils.addWatermark
+import com.n0stalgiaultra.utils.adjustBitmap
 import com.n0stalgiaultra.utils.getLastLocation
 import com.n0stalgiaultra.utils.isDeviceConnected
 import com.n0stalgiaultra.viewModel.SavePhotoDataViewModel
@@ -63,7 +64,7 @@ class ShowPhotoActivity : AppCompatActivity() {
         val camera = intent.extras?.getString("camera").toString()
         val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
 
-        val adjustedBitmap = Bitmap.createBitmap(bitmap).copy(Bitmap.Config.ARGB_8888, true)//ajusta tamanho e escalonamento
+        val adjustedBitmap = adjustBitmap(bitmap)//ajusta tamanho e escalonamento
         val finalBitmap = addWatermark(adjustedBitmap) // adiciona watermark
 
         binding.cameraImageView.setImageBitmap(
@@ -79,7 +80,6 @@ class ShowPhotoActivity : AppCompatActivity() {
                 val photoModel = getInfo(finalBitmap, camera)
                 sendPhotoViewModel.localPhotoModel = photoModel
                 savePhotoViewModel.insertPhotoData(photoModel)
-
             }
         }
         binding.buttonExportDatabase.setOnClickListener {

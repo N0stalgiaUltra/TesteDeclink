@@ -18,7 +18,7 @@ fun addWatermark(bitmap: Bitmap): Bitmap{
     val currentDateTime = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault())
         .format(Date(System.currentTimeMillis()))
 
-    val x = bitmap.width - 1000f
+    val x = bitmap.width - 900f
     val y = bitmap.height - 20f
 
     canvas.drawText(
