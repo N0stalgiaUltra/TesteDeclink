@@ -4,6 +4,7 @@
 Repositório utilizado para o desenvolvimento do teste para a empresa Declink. 
 O aplicativo foi feito em Kotlin e XML, utilizando de conceitos básicos como Activities, View, Lifecycle, Services, etc. 
 O objetivo da aplicação foi exemplificar meu conhecimento em determinadas áreas do desenvolvimento Android.
+O Simulador usado foi Pixel 3a API 28.
 
 
 ## Tecnologias Utilizadas
@@ -51,9 +52,9 @@ As camadas são:
 Com a ajuda com CameraX, a aplicação consegue tirar fotos da maneira que o usuário desejar. A primeira activity a ser aberta é a da camera, onde é solicitada permissões e, com o aval do usuário, a aplicação já registra as fotos. 
 Após tirar as fotos, o usuário é levado para uma nova atividade, onde tem a escolha de tirar uma nova foto, case deseje. 
 
-<b>Importante ressaltar que todas as fotos, sejam pela camera frontal ou traseira, já contam com a marca d'agua especificada na descrição do desafio tecnico. 
+<b>Importante ressaltar que todas as fotos, sejam pela camera frontal ou traseira, já contam com a marca d'agua especificada na descrição do desafio tecnico</b>. 
 
-
+Observação: Em poucos dispositivos, a foto aparece rotacionada. Com versões mais recentes do android, as fotos tem aparecido da maneira ideal com a marca dagua.
 ### Recuperação de dados do aparelho
 
 Após as fotos serem batidas e o usuário ser levado à uma nova activity. A aplicação irá guardar todos os 14 dados, em sua maioria oriundos da Android SDK, no banco de dados local.
@@ -71,18 +72,21 @@ Sobre a ordem de funcionamento, os passos são os seguintes:
   - Após a conversão o dado é enviado, retornando uma resposta
   - Resposta exibida através de um Toast na Activity. 
 
-Importante ressaltar que foram feitos testes unitários para validar o funcionamento dessa feature. 
+Importante ressaltar que foram feitos [Testes unitários](https://github.com/N0stalgiaUltra/TesteDeclink/blob/833da476620927477c8488167c8d0c9483fe1dac/androidDeclinkTest/data/src/test/java/com/n0stalgiaultra/data/PhotoApiUnitTest.kt) para validar o funcionamento dessa feature. 
 Primeiro, na camada de Data, foi mockado um servidor para responder as chamadas da API. 
 Após o retorno, existem dois testes para validarem quando a resposta for bem ou mal sucedida. 
 
-Ainda sobre os testes, por se tratar de uma feature que atua em mais de um módulo, foram realizados testes instrumentados para validar quando alterar o campo 'TRANSMITIDO' nos dados locais. 
+Ainda sobre os testes, por se tratar de uma feature que atua em mais de um módulo, foram realizados [Testes Instrumentados](https://github.com/N0stalgiaUltra/TesteDeclink/blob/833da476620927477c8488167c8d0c9483fe1dac/androidDeclinkTest/database/src/androidTest/java/com/n0stalgiaultra/database/DatabaseTest.kt)  para validar quando alterar o campo 'TRANSMITIDO' nos dados locais. 
 
 ### Exportação do banco de dados 
 
 Por fim, a aplicação também exporta seu banco de dados em um arquivo JSON. Ao clicar no botão "Exportar dados do BD", O banco de dados é convertido para JSON e exportado para a aplicação nativa/padrão do celular, chamada "Files".
+Ao entrar no Files, é necessário o uso de um SD, busque por 'backup-declink' e o arquivo JSON deve aparecer lá. 
 
-Para um entendimento melhor, mostrarei como encontrar o arquivo JSON exportado, tanto via emulador, quanto via Celular:
-
+Observações: 
+1- Caso seu celular não tenha um SD instalado, essa exportação dará erro. 
+2- Existem casos onde a Files não exibe os arquivos diretamente no celular, sendo necessário o uso do computador para realizar essas tarefas
+3- Minha sugestão é testar essa funcionalidade no computador, onde é possivel baixar o json via Android Studio, através da aba Device Explorer, com o seguinte caminho: (/sdcard/Android/data/com.n0stalgiaultra.androidtest/files/Documents/backup-declink/bd-declink.json). 
 
 
  
